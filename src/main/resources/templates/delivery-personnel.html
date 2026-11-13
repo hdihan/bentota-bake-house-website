@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Personnel Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .top-nav {
+            background: white; padding: 12px 30px; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;
+        }
+        .top-nav .left-area { display: flex; align-items: center; gap: 20px; }
+        .top-nav .btn-back {
+            background: #f0f2f5; border: 1px solid #d1d5db; padding: 8px 16px; border-radius: 8px;
+            color: #374151; text-decoration: none; font-weight: 600; transition: 0.2s;
+        }
+        .top-nav .btn-back:hover { background: #e5e7eb; }
+        .top-nav .page-title { font-size: 20px; font-weight: 700; color: #1e293b; }
+        .top-nav .right-area { display: flex; align-items: center; gap: 12px; }
+        .top-nav .btn-logout {
+            background: #ef4444; color: white; border: none; padding: 8px 20px; border-radius: 8px;
+            font-weight: 600; cursor: pointer;
+        }
+
+        .main-content { padding: 30px; }
+        .data-card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-orange { background: #f97316; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
+        .btn-orange:hover { background: #ea580c; transform: translateY(-1px); }
+        .btn-edit { background: #3b82f6; color: white; border: none; padding: 6px 14px; border-radius: 6px; margin-right: 5px; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; }
+        .status-available { background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-busy { background: #fee2e2; color: #b91c1c; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-offline { background: #f3f4f6; color: #4b5563; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .alert-success { background: #d1fae5; color: #065f46; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #10b981; display: flex; align-items: center; gap: 10px; }
+        .alert-error { background: #fee2e2; color: #b91c1c; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #ef4444; display: flex; align-items: center; gap: 10px; }
+        table { width: 100%; }
+        th { text-align: left; padding: 12px 8px; color: #64748b; font-weight: 600; font-size: 13px; }
+        td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; }
+        .form-control:focus, .form-select:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<div class="top-nav">
+    <div class="left-area">
+        <a href="/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <span class="page-title">Delivery Personnel</span>
+    </div>
+    <div class="right-area">
+        <span class="fw-bold text-dark me-3"><i class="fas fa-user-circle me-1"></i><span sec:authentication="name"></span></span>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="main-content">
+    <div th:if="${success}" class="alert-success"><i class="fas fa-check-circle fa-lg"></i> <span th:text="${success}"></span></div>
+    <div th:if="${error}" class="alert-error"><i class="fas fa-exclamation-circle fa-lg"></i> <span th:text="${error}"></span></div>
+
+    <!-- Add Driver Form -->
+    <div class="data-card">
+        <h4 class="mb-3"><i class="fas fa-user-plus"></i> Add New Delivery Driver</h4>
+        <form th:action="@{/staff/delivery/personnel/add}" method="post" id="addDriverForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="name" class="form-control" placeholder="Full Name" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="tel" name="phone" class="form-control" placeholder="Phone (10 digits)" pattern="[0-9]{10}" maxlength="10" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                </div>
+                <div class="col-md-2">
+                    <select name="vehicleType" class="form-select" required>
+                        <option value="">Vehicle</option>
+                        <option value="Bike">🏍️ Bike</option>
+                        <option value="Car">🚗 Car</option>
+                        <option value="Van">🚐 Van</option>
+                        <option value="Truck">🚚 Truck</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn-orange w-100"><i class="fas fa-plus"></i> Add</button>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-4">
+                    <input type="text" name="vehicleNumber" class="form-control" placeholder="Vehicle Number (Optional)">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Drivers List -->
+    <div class="data-card">
+        <h4 class="mb-3"><i class="fas fa-users"></i> Delivery Drivers</h4>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr><th>Driver</th><th>Contact</th><th>Vehicle</th><th>Status</th><th>Deliveries</th><th>Rating</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${personnel}">
+                    <td>
+                        <strong th:text="${d.name}"></strong><br>
+                        <small class="text-muted" th:text="${d.email}"></small>
+                    </td>
+                    <td><i class="fas fa-phone"></i> <span th:text="${d.phone}"></span></td>
+                    <td>
+                        <span th:text="${d.vehicleType}"></span>
+                        <span th:if="${d.vehicleNumber}" class="text-muted">(<span th:text="${d.vehicleNumber}"></span>)</span>
+                    </td>
+                    <td>
+                        <span th:class="${d.status == 'AVAILABLE' ? 'status-available' : (d.status == 'BUSY' ? 'status-busy' : 'status-offline')}" th:text="${d.status}"></span>
+                    </td>
+                    <td class="text-center"><span class="badge bg-primary rounded-pill" th:text="${d.completedDeliveries}">0</span></td>
+                    <td><i class="fas fa-star text-warning"></i> <span th:text="${d.rating}"></span></td>
+                    <td>
+                        <button class="btn-edit" data-bs-toggle="modal" data-bs-target="#editModal"
+                                th:data-id="${d.id}" th:data-name="${d.name}" th:data-phone="${d.phone}"
+                                th:data-email="${d.email}" th:data-vehicle="${d.vehicleType}"
+                                th:data-vehicle-number="${d.vehicleNumber}" th:data-status="${d.status}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <a th:href="@{/staff/delivery/personnel/delete/{id}(id=${d.id})}" class="btn-delete" onclick="return confirm('Delete this driver?')">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(personnel)}">
+                    <td colspan="7" class="text-center py-4 text-muted">No drivers added yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal (unchanged) -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form th:action="@{/staff/delivery/personnel/update}" method="post" class="modal-content">
+            <input type="hidden" name="id" id="editId">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title"><i class="fas fa-user-edit"></i> Edit Driver</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3"><label class="form-label fw-bold">Full Name</label><input type="text" name="name" id="editName" class="form-control" required></div>
+                <div class="mb-3"><label class="form-label fw-bold">Phone Number (10 digits)</label><input type="tel" name="phone" id="editPhone" class="form-control" pattern="[0-9]{10}" maxlength="10" required></div>
+                <div class="mb-3"><label class="form-label fw-bold">Email Address</label><input type="email" name="email" id="editEmail" class="form-control" required></div>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><label class="form-label fw-bold">Vehicle Type</label><select name="vehicleType" id="editVehicle" class="form-select"><option value="Bike">🏍️ Bike</option><option value="Car">🚗 Car</option><option value="Van">🚐 Van</option><option value="Truck">🚚 Truck</option></select></div>
+                    <div class="col-md-6 mb-3"><label class="form-label fw-bold">Vehicle Number</label><input type="text" name="vehicleNumber" id="editVehicleNumber" class="form-control" placeholder="Optional"></div>
+                </div>
+                <div class="mb-3"><label class="form-label fw-bold">Status</label><select name="status" id="editStatus" class="form-select"><option value="AVAILABLE">🟢 Available</option><option value="BUSY">🟡 Busy</option><option value="OFFLINE">⚫ Offline</option></select></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn-orange">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editId').value = this.dataset.id;
+            document.getElementById('editName').value = this.dataset.name;
+            document.getElementById('editPhone').value = this.dataset.phone;
+            document.getElementById('editEmail').value = this.dataset.email;
+            document.getElementById('editVehicle').value = this.dataset.vehicle;
+            document.getElementById('editVehicleNumber').value = this.dataset.vehicleNumber || '';
+            document.getElementById('editStatus').value = this.dataset.status || 'AVAILABLE';
+        });
+    });
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function(e) { this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

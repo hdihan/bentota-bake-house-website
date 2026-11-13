@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout – Benthota Bake House</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        body { background: var(--cream); font-family: 'DM Sans', sans-serif; margin: 0; }
+
+        /* NAVBAR */
+        .top-nav {
+            background: var(--ink); padding: 0 30px; height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-icon { width: 40px; height: 40px; background: var(--brand); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .brand-name { font-family: 'Playfair Display', serif; color: white; font-size: 1.1rem; font-weight: 700; }
+        .nav-right { display: flex; align-items: center; gap: 14px; }
+        .user-chip { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; }
+        .user-chip .avatar { width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; }
+        .btn-logout { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #FCA5A5; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+
+        .content { padding: 40px; }
+        .checkout-card { background: white; border-radius: 16px; border: 1.5px solid var(--border); padding: 30px; box-shadow: var(--shadow-sm); }
+        .summary-card { background: white; border-radius: 16px; border: 1.5px solid var(--border); padding: 30px; box-shadow: var(--shadow-sm); height: fit-content; }
+
+        .form-label {
+            font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
+            text-transform: uppercase; color: var(--ink-muted); margin-bottom: 7px; display: block;
+        }
+        .form-control, .form-select {
+            width: 100%; padding: 12px 14px;
+            background: var(--cream); border: 1.5px solid var(--border);
+            border-radius: 10px; font-family: 'DM Sans', sans-serif;
+            font-size: 0.92rem; color: var(--ink); transition: all 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none; border-color: var(--brand);
+            background: white; box-shadow: 0 0 0 3px rgba(200,96,26,0.1);
+        }
+        .btn-place-order {
+            width: 100%; padding: 14px;
+            background: var(--brand); color: white;
+            border: none; border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-place-order:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(200,96,26,0.3); }
+        .btn-back-cart {
+            background: transparent; border: 2px solid var(--border);
+            color: var(--ink-muted); padding: 12px 24px; border-radius: 10px;
+            font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-back-cart:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
+
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .top-nav { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<!-- TOP NAV (dark) -->
+<nav class="top-nav">
+    <a href="/home" class="brand">
+        <div class="brand-icon"><i class="fas fa-bread-slice"></i></div>
+        <span class="brand-name">Benthota Bake House</span>
+    </a>
+    <div class="nav-right">
+        <div class="user-chip">
+            <div class="avatar"><i class="fas fa-user" style="font-size:12px"></i></div>
+            <span sec:authentication="name">User</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+        </form>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="content">
+    <div class="row g-4">
+        <!-- LEFT: Checkout Form -->
+        <div class="col-lg-7">
+            <div class="checkout-card">
+                <h4 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                    <i class="fas fa-clipboard-check me-2" style="color:var(--brand)"></i> Order Details
+                </h4>
+                <form th:action="@{/checkout}" method="post">
+                    <!-- Order Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Order Type</label>
+                        <select name="orderType" id="orderType" class="form-select" required>
+                            <option value="PRE_ORDER">Pre‑order (Pickup at shop)</option>
+                            <option value="ONLINE">Online Order (Delivery)</option>
+                        </select>
+                    </div>
+
+                    <!-- Delivery Method -->
+                    <div class="mb-3">
+                        <label class="form-label">Delivery Method</label>
+                        <select name="deliveryMethod" id="deliveryMethod" class="form-select" required>
+                            <option value="PICKUP">Pickup (for pre‑orders)</option>
+                            <option value="PICKME">PickMe</option>
+                            <option value="UBER">Uber</option>
+                            <option value="SELF_DELIVERY">Self Delivery</option>
+                        </select>
+                    </div>
+
+                    <!-- Pickup Time (only for pre‑orders) -->
+                    <div class="mb-3" id="pickupTimeDiv">
+                        <label class="form-label">Pickup Date & Time</label>
+                        <input type="datetime-local" name="pickupDateTime" class="form-control">
+                    </div>
+
+                    <!-- Delivery Address (only for online orders) -->
+                    <div class="mb-3" id="deliveryAddressDiv" style="display:none;">
+                        <label class="form-label">Delivery Address</label>
+                        <textarea name="deliveryAddress" class="form-control" rows="2" placeholder="Enter full address"></textarea>
+                        <small class="text-muted">Leave blank to use your profile address.</small>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select name="paymentMethod" class="form-select" required>
+                            <option value="COD">Cash on Delivery / Pickup</option>
+                            <option value="ONLINE">Online Payment (Demo)</option>
+                        </select>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-3">
+                        <label class="form-label">Additional Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Any special requests?"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-place-order">
+                        <i class="fas fa-check-circle"></i> Place Order
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="col-lg-5">
+            <div class="summary-card">
+                <h5 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
+                    <i class="fas fa-receipt me-2" style="color:var(--brand)"></i> Order Summary
+                </h5>
+                <div th:if="${total == 0}" class="text-center py-3 text-muted">
+                    <i class="fas fa-shopping-bag fa-2x mb-2"></i>
+                    <p>Your cart is empty. <a href="/cart">Add some goodies!</a></p>
+                </div>
+                <div th:if="${total > 0}">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span th:text="'Rs. ' + ${#numbers.formatDecimal(total,1,2)}">0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Delivery:</span>
+                        <span>Calculated at checkout</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total:</span>
+                        <span th:text="'Rs. ' + ${#numbers.formatDecimal(total,1,2)}">0.00</span>
+                    </div>
+                </div>
+                <a href="/cart" class="btn-back-cart mt-3">
+                    <i class="fas fa-arrow-left"></i> Back to Cart
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const orderTypeSelect = document.getElementById('orderType');
+    const pickupDiv = document.getElementById('pickupTimeDiv');
+    const addressDiv = document.getElementById('deliveryAddressDiv');
+
+    function toggleFields() {
+        const isPreOrder = orderTypeSelect.value === 'PRE_ORDER';
+        pickupDiv.style.display = isPreOrder ? 'block' : 'none';
+        addressDiv.style.display = isPreOrder ? 'none' : 'block';
+    }
+
+    orderTypeSelect.addEventListener('change', toggleFields);
+    // Set correct initial state
+    toggleFields();
+</script>
+
+</body>
+</html>

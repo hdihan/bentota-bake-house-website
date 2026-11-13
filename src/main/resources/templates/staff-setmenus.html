@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Menus – Benthota Bake House</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:class="${role + '-theme'}">
+<nav class="top-nav top-nav-dark">
+    <div class="container">
+        <a href="/dashboard" class="btn-back text-white"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <span class="page-title font-playfair text-white">Set Menus</span>
+        <div>
+            <span class="text-white me-3"><span sec:authentication="name"></span></span>
+            <form th:action="@{/logout}" method="post" class="d-inline"><button type="submit" class="btn-logout">Logout</button></form>
+        </div>
+    </div>
+</nav>
+<div class="container-custom py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold">Set Menus</h3>
+        <div class="d-flex gap-2">
+            <a href="/reports/inventory" class="nav-btn primary"><i class="fas fa-chart-line"></i> Reports</a>
+            <a href="/staff/setmenus/new" class="btn btn-primary"><i class="fas fa-plus"></i> New Set Menu</a>
+        </div>
+    </div>
+    <div th:if="${param.success}" class="alert alert-success">Set menu saved!</div>
+    <div class="card">
+        <table class="table">
+            <thead><tr><th>Name</th><th>Category</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+            <tr th:each="menu : ${setMenus}">
+                <td th:text="${menu.name}"></td>
+                <td th:text="${menu.category}"></td>
+                <td><span th:each="item, stat : ${menu.items}" th:text="${item.itemName} + (stat.last ? '' : ', ')"></span></td>
+                <td><span th:text="${menu.status}"></span></td>
+                <td>
+                    <a th:href="@{/staff/setmenus/edit/{id}(id=${menu.id})}" class="btn btn-sm btn-outline">Edit</a>
+                    <a th:href="@{/staff/setmenus/delete/{id}(id=${menu.id})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error – Benthota Bake House</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:class="${role + '-theme'}">
+<div class="container-custom py-5 text-center">
+    <i class="fas fa-exclamation-triangle fa-5x" style="color:var(--brand);margin-bottom:20px"></i>
+    <h2 class="fw-bold">Something went wrong</h2>
+    <p class="text-muted" th:text="${error}">An unexpected error occurred.</p>
+    <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+</div>
+</body>
+</html>

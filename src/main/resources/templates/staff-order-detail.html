@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details – Staff</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:class="${role + '-theme'}">
+<nav class="top-nav top-nav-dark">
+    <div class="container">
+        <a href="/dashboard" class="btn-back text-white"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <span class="page-title font-playfair text-white">Order #<span th:text="${order.id}"></span></span>
+        <div>
+            <span class="text-white me-3"><span sec:authentication="name"></span></span>
+            <form th:action="@{/logout}" method="post" class="d-inline"><button type="submit" class="btn-logout">Logout</button></form>
+        </div>
+    </div>
+</nav>
+<div class="container-custom py-4">
+    <div th:if="${param.updated}" class="alert alert-success">Status updated!</div>
+    <div th:if="${emailSent}" class="alert alert-info">Email sent.</div>
+    <div class="card">
+        <div class="d-flex justify-content-between">
+            <h3>Order #<span th:text="${order.id}"></span></h3>
+            <span class="badge" th:classappend="'status-' + ${order.status}" th:text="${order.status}"></span>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6"><p><strong>Customer:</strong> <span th:text="${order.user.username}"></span> (<span th:text="${order.user.email}"></span>)</p>
+                <p><strong>Date:</strong> <span th:text="${order.orderDate}"></span></p>
+                <p><strong>Type:</strong> <span th:text="${order.orderType}"></span></p>
+            </div>
+            <div class="col-md-6"><p><strong>Delivery:</strong> <span th:text="${order.deliveryMethod}"></span></p>
+                <p th:if="${order.deliveryAddress}"><strong>Address:</strong> <span th:text="${order.deliveryAddress}"></span></p>
+                <p th:if="${order.pickupTime}"><strong>Pickup:</strong> <span th:text="${order.pickupTime}"></span></p>
+            </div>
+        </div>
+        <h5>Items</h5>
+        <table class="table">
+            <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+            <tbody>
+            <tr th:each="item : ${order.items}">
+                <td th:text="${item.product.name}">-</td><td th:text="${item.quantity}">0</td>
+                <td th:text="'Rs. ' + ${item.priceAtOrder}">0</td><td th:text="'Rs. ' + (${item.priceAtOrder * item.quantity})">0</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="text-end"><h5>Total: <span th:text="'Rs. ' + ${order.totalAmount}"></span></h5></div>
+
+        <div class="mt-4 pt-3 border-top">
+            <h5>Update Status</h5>
+            <form th:action="@{/staff/orders/{id}/status(id=${order.id})}" method="post" class="row g-2">
+                <div class="col-auto">
+                    <select name="status" class="form-select">
+                        <option value="PENDING" th:selected="${order.status == 'PENDING'}">Pending</option>
+                        <option value="CONFIRMED" th:selected="${order.status == 'CONFIRMED'}">Confirmed</option>
+                        <!-- other statuses -->
+                    </select>
+                </div>
+                <div class="col-auto"><button type="submit" class="btn btn-primary">Update</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

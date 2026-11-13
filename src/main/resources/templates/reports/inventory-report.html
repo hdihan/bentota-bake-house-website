@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Reports – Benthota Bake House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --brand: #C8601A; --brand-dark: #9E4A12;
+        }
+
+        body {
+            background: #0F0B08;
+            font-family: 'DM Sans', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* TOP NAV */
+        .top-nav {
+            background: #1A110A;
+            padding: 0 30px; height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1.5px solid rgba(200,96,26,0.2);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .left-area { display: flex; align-items: center; gap: 20px; }
+        .btn-back {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 16px; border-radius: 8px; color: rgba(255,255,255,0.85);
+            text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.15); border-color: var(--brand); color: white; }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: white; font-weight: 700; }
+        .right-area { display: flex; align-items: center; gap: 14px; }
+        .user-chip { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; }
+        .user-chip .avatar { width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; }
+        .btn-logout {
+            background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
+            color: #FCA5A5; padding: 8px 18px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+
+        .main-content { padding: 30px 40px; width: 100%; }
+
+        /* STAT / FILTER CARDS */
+        .stat-card {
+            background: #1A110A; border: 1.5px solid rgba(200,96,26,0.15);
+            border-radius: 16px; padding: 20px; margin-bottom: 20px;
+        }
+        .stat-value {
+            font-size: 28px; font-weight: 700; color: #FDB975;
+            font-family: 'Playfair Display', serif;
+        }
+        .stat-label { color: rgba(255,255,255,0.6); }
+        .filter-bar {
+            background: #1A110A; border: 1.5px solid rgba(200,96,26,0.15);
+            border-radius: 16px; padding: 20px; margin-bottom: 20px;
+        }
+        .filter-bar label { color: rgba(255,255,255,0.7) !important; }
+
+        /* ===== ORANGE TABLES (hover fix applied) ===== */
+        .table {
+            color: #ffffff !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table thead th {
+            background-color: var(--brand) !important;
+            color: white !important;
+            border: none !important;
+            padding: 14px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .table tbody td {
+            background-color: rgba(200,96,26,0.08) !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid rgba(200,96,26,0.2) !important;
+            padding: 12px 16px;
+        }
+        .table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        /* --- HOVER FIX – no white flash, smooth orange --- */
+        .table-hover tbody tr:hover {
+            background-color: transparent !important;
+        }
+        .table tbody tr:hover td {
+            background-color: rgba(200,96,26,0.25) !important;
+            transition: background-color 0.2s ease;
+        }
+
+        .badge-low { background-color: #ef4444; color: white; padding: 5px 10px; border-radius: 20px; font-size: 11px; }
+
+        .btn-primary {
+            background: var(--brand); border: none; color: white;
+            font-weight: 600; transition: all 0.2s;
+        }
+        .btn-primary:hover { background: var(--brand-dark); }
+
+        /* Headings */
+        h3, h6, .fw-bold { color: white !important; }
+        .text-muted { color: rgba(255,255,255,0.5) !important; }
+
+        /* Chart background */
+        canvas { background: rgba(255,255,255,0.03); border-radius: 8px; }
+
+        /* Form controls */
+        .form-select {
+            background-color: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .form-select:focus {
+            background-color: rgba(255,255,255,0.15);
+            border-color: var(--brand);
+            color: white;
+        }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<nav class="top-nav">
+    <div class="left-area">
+        <a href="/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <span class="page-title">Inventory Reports</span>
+    </div>
+    <div class="right-area">
+        <div class="user-chip">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <span sec:authentication="name">Username</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="main-content">
+    <h3 class="fw-bold mb-3">Inventory Reports</h3>
+    <p class="text-muted mb-4">Analyze stock patterns, track sales, and optimize production</p>
+
+    <!-- Current Month Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-shopping-cart fa-2x mb-2" style="color:#93C5FD"></i>
+                <h6 class="stat-label">This Month Sales</h6>
+                <div class="stat-value" th:text="${currentMonthStats.totalSold}">0</div>
+                <small class="text-muted">items sold</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-boxes fa-2x mb-2" style="color:#86EFAC"></i>
+                <h6 class="stat-label">This Month Stock Added</h6>
+                <div class="stat-value" th:text="${currentMonthStats.totalRestocked}">0</div>
+                <small class="text-muted">items restocked</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-rupee-sign fa-2x mb-2" style="color:#FDB975"></i>
+                <h6 class="stat-label">This Month Revenue</h6>
+                <div class="stat-value" th:text="'Rs. ' + ${#numbers.formatDecimal(currentMonthStats.totalRevenue, 1, 2)}">0.00</div>
+                <small class="text-muted">total revenue</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-receipt fa-2x mb-2" style="color:#F9A8D4"></i>
+                <h6 class="stat-label">This Month Orders</h6>
+                <div class="stat-value" th:text="${currentMonthStats.totalOrders}">0</div>
+                <small class="text-muted">orders processed</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-box-open fa-2x mb-2" style="color:rgba(255,255,255,0.5)"></i>
+                <h6 class="stat-label">Total Products</h6>
+                <div class="stat-value" th:text="${summary.totalProducts}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color:#FCA5A5"></i>
+                <h6 class="stat-label">Low Stock</h6>
+                <div class="stat-value" style="color:#FCA5A5" th:text="${summary.lowStockCount}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-hourglass-half fa-2x mb-2" style="color:#FDE68A"></i>
+                <h6 class="stat-label">Expiring Soon</h6>
+                <div class="stat-value" style="color:#FDE68A" th:text="${summary.expiringCount}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-dollar-sign fa-2x mb-2" style="color:#86EFAC"></i>
+                <h6 class="stat-label">Inventory Value</h6>
+                <div class="stat-value" style="color:#86EFAC" th:text="'Rs. ' + ${#numbers.formatDecimal(summary.totalInventoryValue, 1, 2)}">0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="stat-card">
+                <h6 class="fw-bold mb-3">Monthly Sales vs Restocked</h6>
+                <canvas id="monthlyChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <h6 class="fw-bold mb-3">Top Selling Products</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead>
+                        <tbody id="topSellingBody">
+                        <tr><td colspan="3" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Category</label>
+                <select id="categoryFilter" class="form-select">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.name}" th:text="${cat.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Stock Status</label>
+                <select id="stockStatusFilter" class="form-select">
+                    <option value="">All</option>
+                    <option value="LOW">Low Stock (&lt; 5)</option>
+                    <option value="NORMAL">Normal Stock</option>
+                    <option value="OUT">Out of Stock</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button class="btn btn-primary w-100" onclick="loadReport()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Table -->
+    <div class="stat-card">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Product Name</th><th>Category</th><th>Current Stock</th><th>Unit Price</th><th>Total Value</th>
+                    <th>Month Sold</th><th>Month Restocked</th><th>Expiration Date</th><th>Status</th>
+                </tr>
+                </thead>
+                <tbody id="reportBody">
+                <tr><td colspan="9" class="text-center">Click "Apply Filters" to load data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let monthlyChart;
+
+    async function loadMonthlyChart() {
+        try {
+            const response = await fetch('/reports/monthly-stats');
+            const data = await response.json();
+            if (data.length === 0) return;
+            const labels = data.map(item => item.month);
+            const soldData = data.map(item => item.totalSold);
+            const restockedData = data.map(item => item.totalRestocked);
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            if (monthlyChart) monthlyChart.destroy();
+            monthlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Items Sold', data: soldData, backgroundColor: 'rgba(249, 115, 22, 0.5)', borderColor: '#f97316', borderWidth: 1 },
+                        { label: 'Items Restocked', data: restockedData, backgroundColor: 'rgba(16, 185, 129, 0.5)', borderColor: '#10b981', borderWidth: 1 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, title: { display: true, text: 'Quantity' } } } }
+            });
+        } catch (error) { console.error('Error loading chart:', error); }
+    }
+
+    async function loadTopSelling() {
+        try {
+            const response = await fetch('/reports/top-selling?limit=5');
+            const data = await response.json();
+            const tbody = document.getElementById('topSellingBody');
+            if (!data.topSellingProducts || data.topSellingProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center">No sales data yet</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.topSellingProducts.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.sold}</td>
+                    <td>Rs. ${item.revenue.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        } catch (error) { console.error('Error loading top selling:', error); }
+    }
+
+    async function loadReport() {
+        const category = document.getElementById('categoryFilter').value;
+        const stockStatus = document.getElementById('stockStatusFilter').value;
+        let url = `/reports/inventory/data?`;
+        if (category) url += `category=${encodeURIComponent(category)}&`;
+        if (stockStatus) url += `stockStatus=${encodeURIComponent(stockStatus)}&`;
+
+        try {
+            document.getElementById('reportBody').innerHTML = '<tr><td colspan="9" class="text-center">Loading...</td></tr>';
+            const response = await fetch(url);
+            const data = await response.json();
+            const tbody = document.getElementById('reportBody');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center">No products found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td class="fw-bold">${item.productName || 'N/A'}</td>
+                    <td>${item.category || 'N/A'}</td>
+                    <td>
+                        ${item.currentStock || 0}
+                        ${item.currentStock < 5 ? '<span class="badge-low ms-2">Low Stock</span>' : ''}
+                    </td>
+                    <td>Rs. ${item.unitPrice || 0}</td>
+                    <td>Rs. ${((item.currentStock || 0) * (item.unitPrice || 0)).toFixed(2)}</td>
+                    <td>${item.totalSold || 0}</td>
+                    <td>${item.totalRestocked || 0}</td>
+                    <td>${item.expirationDate || 'N/A'}</td>
+                    <td><span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-secondary'}">${item.status || 'Inactive'}</span></td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Error loading report:', error);
+            document.getElementById('reportBody').innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading data</td></tr>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadMonthlyChart();
+        loadTopSelling();
+        loadReport();
+    });
+</script>
+</body>
+</html>

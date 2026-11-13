@@ -1,0 +1,609 @@
+/* ==========================================================================
+   BENTHOTA BAKE HOUSE – COMPLETE SYSTEM‑WIDE THEME
+   Orange + Ink + Cream, Playfair Display / DM Sans
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --brand: #C8601A;
+    --brand-dark: #9E4A12;
+    --brand-light: #FDF0E6;
+    --cream: #FEFAF5;
+    --ink: #1C1410;
+    --ink-muted: #7A6A5A;
+    --border: #EDE0D0;
+    --shadow-sm: 0 2px 8px rgba(28,20,16,0.06);
+    --shadow-md: 0 8px 24px rgba(28,20,16,0.08);
+    --shadow-lg: 0 16px 40px rgba(200,96,26,0.12);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1, h2, h3, h4, h5, h6,
+.navbar-brand, .brand-name, .page-title, .section-title,
+.font-playfair {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+a {
+    color: var(--brand);
+    transition: var(--transition);
+}
+a:hover {
+    color: var(--brand-dark);
+}
+
+/* ========== TOP NAVIGATION (LIGHT & DARK) ========== */
+.top-nav {
+    background: white;
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 30px;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(28,20,16,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.top-nav-dark {
+    background: var(--ink);
+    border-bottom: 1.5px solid rgba(200,96,26,0.25);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.top-nav-dark .brand-name,
+.top-nav-dark .nav-btn,
+.top-nav-dark .page-title {
+    color: white;
+}
+
+.top-nav .container,
+.top-nav-dark .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+}
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--brand);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+}
+.top-nav-dark .brand-name {
+    color: white;
+}
+
+/* Back button */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 13px;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+}
+.btn-back:hover {
+    background: var(--brand-light);
+    border-color: var(--brand);
+    color: var(--brand);
+}
+.top-nav-dark .btn-back {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.85);
+}
+.top-nav-dark .btn-back:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: var(--brand);
+    color: white;
+}
+
+/* Nav links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: none;
+    border: 1.5px solid transparent;
+    background: transparent;
+    transition: var(--transition);
+}
+.nav-btn:hover {
+    background: var(--brand-light);
+    color: var(--brand);
+}
+.nav-btn.primary {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+}
+.nav-btn.primary:hover {
+    background: var(--brand-dark);
+}
+.nav-btn.ghost {
+    border-color: var(--border);
+}
+.nav-btn.ghost:hover {
+    border-color: var(--brand);
+}
+
+/* Logout button */
+.btn-logout {
+    background: rgba(239,68,68,0.12);
+    border: 1.5px solid rgba(239,68,68,0.2);
+    color: #DC2626;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: 'DM Sans', sans-serif;
+}
+.btn-logout:hover {
+    background: #DC2626;
+    color: white;
+}
+.top-nav-dark .btn-logout {
+    background: rgba(239,68,68,0.15);
+    border-color: rgba(239,68,68,0.3);
+    color: #FCA5A5;
+}
+.top-nav-dark .btn-logout:hover {
+    background: rgba(239,68,68,0.3);
+}
+
+/* ========== CARDS & SURFACES ========== */
+.card, .stat-card, .detail-card, .section-card, .profile-card,
+.checkout-card, .login-card, .register-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+.card:hover, .stat-card:hover, .nav-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--brand);
+}
+
+/* ========== BUTTONS ========== */
+.btn, .btn-primary, .btn-custom, .btn-orange, .btn-save {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.btn-primary, .btn-custom, .btn-orange, .btn-save {
+    background: var(--brand);
+    color: white;
+    box-shadow: 0 4px 10px rgba(200,96,26,0.3);
+}
+.btn-primary:hover, .btn-custom:hover, .btn-orange:hover, .btn-save:hover {
+    background: var(--brand-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(200,96,26,0.4);
+}
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--brand);
+    color: var(--brand);
+}
+.btn-outline:hover {
+    background: var(--brand);
+    color: white;
+}
+.btn-danger {
+    background: #EF4444;
+    color: white;
+}
+.btn-danger:hover {
+    background: #DC2626;
+}
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+}
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 1rem;
+}
+
+/* ========== FORMS ========== */
+.form-control, .form-select {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--cream);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    transition: var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--brand);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(200,96,26,0.1);
+}
+.form-control::placeholder {
+    color: #B8A898;
+}
+.form-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    margin-bottom: 7px;
+    display: block;
+}
+
+/* ========== TABLES ========== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table thead th {
+    background: var(--cream);
+    color: var(--ink-muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 1.5px solid var(--border);
+    padding: 14px 20px;
+    text-align: left;
+}
+.table tbody td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #F5EDE0;
+    vertical-align: middle;
+    font-size: 14px;
+}
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+.table tbody tr:hover {
+    background: var(--cream);
+}
+
+/* ========== BADGES ========== */
+.badge, .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.badge-success, .status-delivered, .status-completed {
+    background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0;
+}
+.badge-warning, .status-pending, .status-quoted {
+    background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D;
+}
+.badge-danger, .status-cancelled {
+    background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA;
+}
+.badge-primary, .status-processing {
+    background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD;
+}
+.badge-dark {
+    background: var(--ink); color: white;
+}
+
+/* ========== BUTTONS FOR QUICK LINKS (NAV CARDS) ========== */
+.nav-card {
+    background: white;
+    border-radius: 16px;
+    border: 1.5px solid var(--border);
+    text-decoration: none;
+    display: block;
+    padding: 28px 20px;
+    text-align: center;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    color: var(--ink);
+}
+.nav-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--brand);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+}
+.nav-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--brand);
+    box-shadow: var(--shadow-lg);
+}
+.nav-card:hover::before {
+    transform: scaleX(1);
+}
+.nav-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 14px;
+}
+.nav-card-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+.nav-card-sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+}
+.nav-card-arrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    color: var(--border);
+    font-size: 12px;
+    transition: color 0.2s;
+}
+.nav-card:hover .nav-card-arrow {
+    color: var(--brand);
+}
+
+/* ========== ALERTS ========== */
+.alert {
+    padding: 14px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    border: 1.5px solid;
+}
+.alert-success {
+    background: #F0FDF4; border-color: #BBF7D0; color: #166534;
+}
+.alert-danger {
+    background: #FEF2F2; border-color: #FECACA; color: #991B1B;
+}
+.alert-info {
+    background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF;
+}
+.alert-warning {
+    background: #FFFBEB; border-color: #FDE68A; color: #92400E;
+}
+
+/* ========== MODALS ========== */
+.modal-content {
+    border: none;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1.5px solid var(--border);
+    background: var(--cream);
+}
+.modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+}
+.modal-body {
+    padding: 24px;
+}
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1.5px solid var(--border);
+    background: var(--cream);
+}
+
+/* ========== MISCELLANEOUS ========== */
+.container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+.promo-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--brand);
+    color: white;
+    padding: 3px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.chat-fab {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    width: 58px; height: 58px;
+    background: var(--brand);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 8px 24px rgba(200,96,26,0.4);
+    transition: var(--transition);
+    text-decoration: none;
+    z-index: 999;
+}
+.chat-fab:hover {
+    background: var(--brand-dark);
+    transform: scale(1.1);
+}
+
+/* Utility helpers */
+.text-brand { color: var(--brand) !important; }
+.bg-brand-light { background: var(--brand-light); }
+.bg-cream { background: var(--cream); }
+.border-brand { border-color: var(--brand) !important; }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .top-nav { padding: 0 16px; }
+    .nav-links { gap: 4px; }
+    .nav-btn { padding: 6px 12px; font-size: 12px; }
+
+
+    /* ==========================================================================
+   DARK NAV BAR FOR ALL STAFF / ADMIN / SUPER‑ADMIN PAGES
+   (automatically applies when body has a class containing STAFF, ADMIN, or SUPER)
+   ========================================================================== */
+    body[class*="STAFF"] .top-nav,
+    body[class*="ADMIN"] .top-nav,
+    body[class*="SUPER"] .top-nav {
+        background: var(--ink);
+        border-bottom-color: rgba(200,96,26,0.25);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Make all text inside the nav white */
+    body[class*="STAFF"] .top-nav .brand-name,
+    body[class*="ADMIN"] .top-nav .brand-name,
+    body[class*="SUPER"] .top-nav .brand-name,
+    body[class*="STAFF"] .top-nav .btn-back,
+    body[class*="ADMIN"] .top-nav .btn-back,
+    body[class*="SUPER"] .top-nav .btn-back,
+    body[class*="STAFF"] .top-nav .nav-btn,
+    body[class*="ADMIN"] .top-nav .nav-btn,
+    body[class*="SUPER"] .top-nav .nav-btn,
+    body[class*="STAFF"] .top-nav .page-title,
+    body[class*="ADMIN"] .top-nav .page-title,
+    body[class*="SUPER"] .top-nav .page-title,
+    body[class*="STAFF"] .top-nav .user-chip,
+    body[class*="ADMIN"] .top-nav .user-chip,
+    body[class*="SUPER"] .top-nav .user-chip {
+        color: white;
+    }
+
+    /* Fix the back button background for dark nav */
+    body[class*="STAFF"] .top-nav .btn-back,
+    body[class*="ADMIN"] .top-nav .btn-back,
+    body[class*="SUPER"] .top-nav .btn-back {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.15);
+    }
+    body[class*="STAFF"] .top-nav .btn-back:hover,
+    body[class*="ADMIN"] .top-nav .btn-back:hover,
+    body[class*="SUPER"] .top-nav .btn-back:hover {
+        background: rgba(255,255,255,0.15);
+        border-color: var(--brand);
+    }
+
+    /* Logout button – already has dark styles, but ensure consistency */
+    body[class*="STAFF"] .top-nav .btn-logout,
+    body[class*="ADMIN"] .top-nav .btn-logout,
+    body[class*="SUPER"] .top-nav .btn-logout {
+        background: rgba(239,68,68,0.15);
+        border-color: rgba(239,68,68,0.3);
+        color: #FCA5A5;
+    }
+}

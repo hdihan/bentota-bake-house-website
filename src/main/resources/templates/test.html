@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:class="${role + '-theme'}">
+<div class="container-custom py-5">
+    <h1>Inventory Reports Test Page</h1>
+    <p>If you see this, the route is working.</p>
+    <a href="/reports/inventory" class="btn btn-primary">Go to Inventory Report</a>
+</div>
+</body>
+</html>

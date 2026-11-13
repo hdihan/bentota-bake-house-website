@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Catering Delivery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        .container-custom { max-width: 700px; margin: 40px auto; }
+        .card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--shadow-sm); }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+<div class="container-custom">
+    <div class="card">
+        <h4 class="fw-bold mb-3"><i class="fas fa-truck me-2" style="color:var(--brand)"></i> Assign Catering Delivery #<span th:text="${catering.id}"></span></h4>
+        <p><strong>Customer:</strong> <span th:text="${catering.customer.fullName}"></span></p>
+        <p><strong>Event Date:</strong> <span th:text="${catering.eventDate}"></span></p>
+        <p><strong>Location:</strong> <span th:text="${catering.location}"></span></p>
+        <p><strong>Guests:</strong> <span th:text="${catering.numberOfGuests}"></span></p>
+        <div th:if="${catering.numberOfGuests > 50}" class="alert alert-warning mt-3">⚠️ Large event – a TRUCK is required.</div>
+        <form th:action="@{/staff/delivery/assign-catering}" method="post" class="mt-4">
+            <input type="hidden" name="cateringId" th:value="${catering.id}">
+            <div class="mb-3">
+                <label class="form-label">Select Driver</label>
+                <select name="personnelId" class="form-select" required>
+                    <option value="">-- Select --</option>
+                    <option th:each="p : ${availablePersonnel}"
+                            th:value="${p.id}"
+                            th:text="${p.name} + ' - ' + ${p.vehicleType} + ' (' + ${p.status} + ')'"
+                            th:disabled="${catering.numberOfGuests > 50 and p.vehicleType != 'Truck'}">
+                    </option>
+                </select>
+                <small th:if="${catering.numberOfGuests > 50}" class="text-muted">Only TRUCK drivers are available for this event.</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Notes (Optional)</label>
+                <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Assign Delivery</button>
+                <a href="/staff/delivery/dashboard" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

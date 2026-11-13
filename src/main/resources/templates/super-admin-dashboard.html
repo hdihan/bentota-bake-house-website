@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - Benthota Bake House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        :root { --brand:#C8601A;--brand-dark:#9E4A12;--brand-light:#FDF0E6;--cream:#FEFAF5;--ink:#1C1410;--ink-muted:#7A6A5A;--border:#EDE0D0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0F0B08; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+        /* TOP NAV — dark luxury */
+        .top-nav {
+            background: #1A110A; border-bottom: 1.5px solid rgba(200,96,26,0.2);
+            padding: 0 36px; height: 68px; display: flex; align-items: center; justify-content: space-between;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+        }
+        .logo-area { display: flex; align-items: center; gap: 14px; }
+        .logo-mark { width: 44px; height: 44px; background: var(--brand); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; }
+        .brand-name { font-family: 'Playfair Display', serif; color: white; font-size: 1.1rem; font-weight: 700; }
+        .brand-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
+        .super-badge { background: rgba(200,96,26,0.2); border: 1px solid rgba(200,96,26,0.4); color: #FDB975; padding: 5px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+        .user-area { display: flex; align-items: center; gap: 12px; }
+        .user-name { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .user-name .av { width: 30px; height: 30px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; }
+        .btn-staff { background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+        .btn-staff:hover { background: rgba(255,255,255,0.12); color: white; }
+        .btn-logout { background: rgba(239,68,68,0.15); border: 1.5px solid rgba(239,68,68,0.3); color: #FCA5A5; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+
+        /* MAIN */
+        .main { margin-top: 68px; padding: 36px; }
+        .page-welcome { margin-bottom: 32px; }
+        .page-welcome .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(253,183,117,0.7); margin-bottom: 6px; }
+        .page-welcome h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: white; }
+
+        /* STAT CARDS */
+        .stat-card { border-radius: 16px; padding: 24px; border: 1.5px solid rgba(255,255,255,0.06); transition: all 0.2s; position: relative; overflow: hidden; }
+        .stat-card::after { content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; border-radius: 50%; opacity: 0.08; }
+        .stat-card:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.12); }
+        .stat-card.c1 { background: linear-gradient(135deg, #1E2A1A, #162112); }
+        .stat-card.c1::after { background: #22C55E; }
+        .stat-card.c2 { background: linear-gradient(135deg, #1A1E2A, #121521); }
+        .stat-card.c2::after { background: #3B82F6; }
+        .stat-card.c3 { background: linear-gradient(135deg, #2A1A10, #211208); }
+        .stat-card.c3::after { background: #F97316; }
+        .stat-card.c4 { background: linear-gradient(135deg, #2A1A22, #211219); }
+        .stat-card.c4::after { background: #EC4899; }
+        .stat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 16px; }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; color: white; line-height: 1; margin-bottom: 6px; }
+        .stat-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+        /* DATA CARDS */
+        .data-card { background: #1A110A; border-radius: 16px; border: 1.5px solid rgba(200,96,26,0.15); margin-bottom: 24px; overflow: hidden; }
+        .data-card-header { padding: 18px 24px; border-bottom: 1.5px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .data-card-header h5 { font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.9rem; margin: 0; display: flex; align-items: center; gap: 8px; }
+        .data-card-header h5 i { color: rgba(253,183,117,0.7); }
+        .btn-view-all { background: rgba(200,96,26,0.15); border: 1.5px solid rgba(200,96,26,0.25); color: #FDB975; padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+        .btn-view-all:hover { background: rgba(200,96,26,0.3); color: #FDB975; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead th { padding: 12px 20px; color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; background: transparent; }
+        tbody td { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; color: rgba(255,255,255,0.7); vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.85); }
+
+        /* Role badges — dark theme */
+        .rb { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+        .rb-super { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.3); color: #C4B5FD; }
+        .rb-admin { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.25); color: #FCA5A5; }
+        .rb-staff { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.25); color: #FDE68A; }
+        .rb-customer { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.25); color: #BFDBFE; }
+        .status-active { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.25); color: #86EFAC; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+        .status-pending { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.25); color: #FDE68A; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+        .order-id { color: rgba(253,183,117,0.7); font-weight: 700; font-size: 12px; }
+        .amount { color: #86EFAC; font-weight: 700; }
+        .empty-td { text-align: center; padding: 48px 20px !important; color: rgba(255,255,255,0.2) !important; }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<div class="top-nav">
+    <div class="logo-area">
+        <div class="logo-mark"><i class="fas fa-bread-slice"></i></div>
+        <div>
+            <div class="brand-name">Benthota Bake House</div>
+            <div class="brand-sub">Super Administrator Portal</div>
+        </div>
+        <span class="super-badge ms-3"><i class="fas fa-crown me-1"></i> Super Admin</span>
+    </div>
+    <div class="user-area">
+        <div class="user-name">
+            <div class="av"><i class="fas fa-user" style="font-size:11px"></i></div>
+            <span sec:authentication="name">Admin</span>
+        </div>
+        <a href="/dashboard" class="btn-staff"><i class="fas fa-th-large me-1"></i> Staff Panel</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-welcome">
+        <div class="eyebrow"><i class="fas fa-crown me-1"></i> Super Admin Dashboard</div>
+        <h2>Good day — full system overview below</h2>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card c1">
+                <div class="stat-icon" style="background:rgba(34,197,94,0.15);color:#86EFAC"><i class="fas fa-users"></i></div>
+                <div class="stat-value" th:text="${totalUsers}">0</div>
+                <div class="stat-label" style="color:#86EFAC">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card c2">
+                <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:#93C5FD"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-value" th:text="${totalOrders}">0</div>
+                <div class="stat-label" style="color:#93C5FD">Total Orders</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card c3">
+                <div class="stat-icon" style="background:rgba(249,115,22,0.15);color:#FDB975"><i class="fas fa-boxes"></i></div>
+                <div class="stat-value" th:text="${totalProducts}">0</div>
+                <div class="stat-label" style="color:#FDB975">Products</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card c4">
+                <div class="stat-icon" style="background:rgba(236,72,153,0.15);color:#F9A8D4"><i class="fas fa-utensils"></i></div>
+                <div class="stat-value" th:text="${activeCatering}">0</div>
+                <div class="stat-label" style="color:#F9A8D4">Active Catering</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- USERS TABLE -->
+        <div class="col-lg-6">
+            <div class="data-card">
+                <div class="data-card-header">
+                    <h5><i class="fas fa-users"></i> Recent Users</h5>
+                    <a href="/admin/users" class="btn-view-all">Manage All →</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+                        <tbody>
+                        <tr th:each="user : ${recentUsers}">
+                            <td style="color:white;font-weight:600" th:text="${user.username}">-</td>
+                            <td th:text="${user.email}">-</td>
+                            <td>
+                                <span th:if="${user.role == 'ROLE_SUPER_ADMIN'}" class="rb rb-super"><i class="fas fa-crown"></i> Super Admin</span>
+                                <span th:if="${user.role == 'ROLE_ADMIN'}" class="rb rb-admin"><i class="fas fa-shield-alt"></i> Admin</span>
+                                <span th:if="${user.role == 'ROLE_STAFF'}" class="rb rb-staff"><i class="fas fa-user-tie"></i> Staff</span>
+                                <span th:if="${user.role == 'ROLE_CUSTOMER'}" class="rb rb-customer"><i class="fas fa-user"></i> Customer</span>
+                            </td>
+                            <td><span class="status-active">Active</span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentUsers)}">
+                            <td colspan="4" class="empty-td"><i class="fas fa-users" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.3"></i>No users found</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDERS TABLE -->
+        <div class="col-lg-6">
+            <div class="data-card">
+                <div class="data-card-header">
+                    <h5><i class="fas fa-shopping-cart"></i> Recent Orders</h5>
+                    <a href="/staff/orders" class="btn-view-all">View All →</a>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+                        <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td><span class="order-id">#<span th:text="${order.id}">-</span></span></td>
+                            <td th:text="${order.user.username}">-</td>
+                            <td><span class="amount">Rs. <span th:text="${order.totalAmount}">0</span></span></td>
+                            <td><span class="status-pending" th:text="${order.status}">-</span></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+                            <td colspan="4" class="empty-td"><i class="fas fa-shopping-cart" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.3"></i>No orders found</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

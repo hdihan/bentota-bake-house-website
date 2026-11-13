@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Menu Form – Benthota Bake House</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body th:class="${role + '-theme'}">
+<nav class="top-nav top-nav-dark">
+    <div class="container">
+        <a href="/staff/setmenus" class="btn-back text-white"><i class="fas fa-arrow-left"></i> Set Menus</a>
+        <span class="page-title font-playfair text-white" th:text="${setMenu.id == null} ? 'Create Set Menu' : 'Edit Set Menu'">Set Menu</span>
+        <div>
+            <span class="text-white me-3"><span sec:authentication="name"></span></span>
+            <form th:action="@{/logout}" method="post" class="d-inline"><button type="submit" class="btn-logout">Logout</button></form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-custom py-4">
+    <div class="card mx-auto" style="max-width:900px;">
+        <h3 class="fw-bold mb-4" th:text="${setMenu.id == null} ? 'Create New Set Menu' : 'Edit Set Menu'">Set Menu</h3>
+        <form th:action="@{/staff/setmenus/save}" method="post" th:object="${setMenu}">
+            <input type="hidden" name="id" th:value="*{id}">
+            <div class="mb-3"><label class="form-label">Name</label><input type="text" class="form-control" th:field="*{name}" required></div>
+            <div class="mb-3"><label class="form-label">Description</label><textarea class="form-control" th:field="*{description}" rows="2"></textarea></div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" th:field="*{category}">
+                        <option value="BREAKFAST">Breakfast</option>
+                        <option value="LUNCH">Lunch</option>
+                        <option value="DINNER">Dinner</option>
+                        <option value="BITES">Bites</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" th:field="*{status}">
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4"><label class="form-label">Base Price (optional)</label><input type="number" step="0.01" class="form-control" th:field="*{basePrice}"></div>
+
+            <h5 class="mt-4 mb-3">Menu Items</h5>
+            <div id="items-container">
+                <div th:each="item, stat : *{items}" class="row mb-2 align-items-center">
+                    <div class="col-md-4">
+                        <select class="form-select" th:name="'productIds[' + ${stat.index} + ']'">
+                            <option value="">-- Select Product --</option>
+                            <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}" th:selected="${item.product != null and item.product.id == p.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3"><input type="text" class="form-control" th:name="'itemNames[' + ${stat.index} + ']'" th:value="${item.itemName}" placeholder="Or custom name"></div>
+                    <div class="col-md-3"><input type="text" class="form-control" th:name="'descriptions[' + ${stat.index} + ']'" th:value="${item.description}" placeholder="Description"></div>
+                    <div class="col-md-2"><input type="number" class="form-control" th:name="'quantities[' + ${stat.index} + ']'" th:value="${item.defaultQuantity}" placeholder="Qty" min="1"></div>
+                    <div class="col-md-auto"><button type="button" class="btn btn-outline-danger remove-item"><i class="fas fa-times"></i></button></div>
+                </div>
+            </div>
+            <button type="button" id="add-item" class="btn btn-sm btn-outline mt-2"><i class="fas fa-plus"></i> Add Item</button>
+            <div class="mt-4"><button type="submit" class="btn btn-primary">Save Set Menu</button></div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('add-item').addEventListener('click', function() {
+        const container = document.getElementById('items-container');
+        const index = container.children.length;
+        const row = document.createElement('div');
+        row.className = 'row mb-2 align-items-center';
+        row.innerHTML = `...`; // use same JS logic
+        container.appendChild(row);
+    });
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
+            e.target.closest('.row').remove();
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

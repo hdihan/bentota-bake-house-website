@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benthota Bake House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        :root {
+            --brand: #C8601A; --brand-dark: #9E4A12; --brand-light: #FDF0E6;
+            --cream: #FEFAF5; --ink: #1C1410; --ink-muted: #7A6A5A; --border: #EDE0D0;
+        }
+        * { box-sizing: border-box; }
+        body { background: var(--cream); font-family: 'DM Sans', sans-serif; margin: 0; }
+
+        /* TOP BAR */
+        .top-bar { background: var(--ink); padding: 8px 0; text-align: center; font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.05em; }
+        .top-bar span { color: #FDB975; }
+
+        /* NAVBAR */
+        .navbar {
+            background: white; border-bottom: 1.5px solid var(--border);
+            padding: 14px 0; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 12px rgba(28,20,16,0.06);
+        }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-icon { width: 44px; height: 44px; background: var(--brand); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; }
+        .brand-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--ink); font-weight: 700; }
+        .brand-sub { font-size: 10px; color: var(--ink-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+
+        /* NAV LINKS */
+        .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .nav-btn {
+            padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+            text-decoration: none; color: var(--ink-muted); transition: all 0.2s; display: flex;
+            align-items: center; gap: 7px; border: 1.5px solid transparent;
+            font-family: 'DM Sans', sans-serif; background: transparent;
+        }
+        .nav-btn:hover { background: var(--brand-light); color: var(--brand); }
+        .nav-btn.primary { background: var(--brand); color: white; border-color: var(--brand); }
+        .nav-btn.primary:hover { background: var(--brand-dark); }
+        .nav-btn.ghost { border-color: var(--border); }
+        .nav-btn.ghost:hover { border-color: var(--brand); }
+        .welcome-pill { display: flex; align-items: center; gap: 8px; padding: 7px 14px; background: var(--brand-light); border-radius: 100px; font-size: 13px; color: var(--brand-dark); font-weight: 500; }
+
+        /* HERO */
+        .hero { padding: 60px 0 40px; text-align: center; }
+        .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--brand-light); border: 1px solid #F2C9A0; color: var(--brand); padding: 6px 18px; border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 20px; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: 3.2rem; color: var(--ink); line-height: 1.15; margin-bottom: 14px; }
+        .hero-title em { color: var(--brand); font-style: italic; }
+        .hero-sub { color: var(--ink-muted); font-size: 1.05rem; max-width: 520px; margin: 0 auto 32px; line-height: 1.7; }
+        .search-bar { max-width: 520px; margin: 0 auto; display: flex; background: white; border: 2px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+        .search-bar:focus-within { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(200,96,26,0.1); }
+        .search-bar input { flex: 1; border: none; padding: 14px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; background: transparent; color: var(--ink); outline: none; }
+        .search-bar input::placeholder { color: #B8A898; }
+        .search-bar button { background: var(--brand); color: white; border: none; padding: 0 24px; font-weight: 600; font-size: 14px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+        .search-bar button:hover { background: var(--brand-dark); }
+
+        /* PROMOTIONS STRIP */
+        .promo-strip {
+            background: linear-gradient(135deg, #FDF0E6, #FFF8F0);
+            border-top: 1.5px solid var(--border);
+            border-bottom: 1.5px solid var(--border);
+            padding: 24px 0;
+            margin-bottom: 40px;
+        }
+        .promo-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1.5px solid var(--border);
+            position: relative;
+            transition: all 0.2s;
+            height: 100%;
+        }
+        .promo-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,96,26,0.12); }
+        .promo-badge { position: absolute; top: -10px; right: 16px; background: var(--brand); color: white; padding: 3px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+        .promo-title { font-weight: 700; color: var(--ink); font-size: 0.95rem; margin-bottom: 6px; }
+        .promo-desc { font-size: 12px; color: var(--ink-muted); margin-bottom: 8px; line-height: 1.5; }
+        .promo-date { font-size: 11px; color: var(--brand); font-weight: 600; }
+
+        /* CATEGORIES & PRODUCTS */
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--ink); margin-bottom: 6px; }
+        .section-sub { font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 24px; }
+        .cat-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+        .cat-pill { padding: 9px 22px; border-radius: 100px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--border); color: var(--ink-muted); text-decoration: none; transition: all 0.2s; background: white; }
+        .cat-pill:hover, .cat-pill.active { background: var(--brand); border-color: var(--brand); color: white; box-shadow: 0 4px 12px rgba(200,96,26,0.25); }
+
+        .product-card { background: white; border-radius: 16px; border: 1.5px solid var(--border); overflow: hidden; transition: all 0.3s; height: 100%; display: flex; flex-direction: column; }
+        .product-card:hover { border-color: #F2C9A0; transform: translateY(-6px); box-shadow: 0 16px 40px rgba(200,96,26,0.12); }
+        .product-img { height: 200px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+        .product-card:hover .product-img img { transform: scale(1.04); }
+        .product-img .placeholder-icon { font-size: 56px; color: #E8C9A0; }
+        .out-of-stock-overlay { position: absolute; inset: 0; background: rgba(28,20,16,0.55); display: flex; align-items: center; justify-content: center; }
+        .out-of-stock-overlay span { background: white; color: var(--ink); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 100px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .product-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; }
+        .cat-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 100px; display: inline-block; margin-bottom: 10px; }
+        .product-name { font-weight: 700; color: var(--ink); font-size: 1rem; margin-bottom: 4px; }
+        .product-name a { color: inherit; text-decoration: none; }
+        .product-name a:hover { color: var(--brand); }
+        .star-row { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; font-size: 12px; color: #F59E0B; }
+        .star-row .count { color: var(--ink-muted); margin-left: 2px; }
+        .product-desc { font-size: 12px; color: var(--ink-muted); line-height: 1.6; margin-bottom: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; margin-top: 14px; border-top: 1.5px dashed var(--border); }
+        .price { font-size: 1.25rem; font-weight: 700; color: var(--brand); font-family: 'Playfair Display', serif; }
+        .btn-cart { background: var(--brand); color: white; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; }
+        .btn-cart:hover { background: var(--brand-dark); transform: translateY(-1px); }
+        .btn-cart-disabled { background: #E5E7EB; color: #9CA3AF; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: not-allowed; }
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--ink-muted); }
+        .empty-state i { font-size: 56px; color: var(--border); margin-bottom: 20px; }
+
+        /* CHAT FAB */
+        .chat-fab { position: fixed; bottom: 28px; right: 28px; width: 58px; height: 58px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 8px 24px rgba(200,96,26,0.4); transition: all 0.2s; text-decoration: none; z-index: 999; }
+        .chat-fab:hover { background: var(--brand-dark); transform: scale(1.1); color: white; }
+        .chat-fab .badge { position: absolute; top: -4px; right: -4px; background: #EF4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+        /* TOAST NOTIFICATIONS */
+        .toast-login, .toast-logout {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px; z-index: 9999;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); font-family: 'DM Sans', sans-serif;
+            transition: opacity 0.3s ease;
+        }
+        .toast-login { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .toast-logout { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+
+        @media (max-width: 768px) {
+            .navbar .container { flex-direction: column; gap: 12px; }
+            .nav-links { justify-content: center; }
+            .hero-title { font-size: 2rem; }
+            .toast-login, .toast-logout { width: 90%; text-align: center; }
+        }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<!-- GRAY TOP STRIP -->
+<div class="top-bar">Free delivery on orders over <span>Rs. 2,500</span> · Fresh baked every morning 🍞</div>
+
+<!-- MAIN NAVIGATION -->
+<nav class="navbar">
+    <div class="container">
+        <a href="/home" class="brand">
+            <div class="brand-icon"><i class="fas fa-bread-slice"></i></div>
+            <div>
+                <div class="brand-name">Benthota Bake House</div>
+                <div class="brand-sub">Fresh &amp; Artisanal</div>
+            </div>
+        </a>
+        <div class="nav-links">
+            <!-- Authenticated -->
+            <div sec:authorize="isAuthenticated()" class="welcome-pill"><i class="fas fa-user-circle"></i><span sec:authentication="name">User</span></div>
+            <a sec:authorize="isAuthenticated()" href="/catering/request" class="nav-btn ghost"><i class="fas fa-utensils"></i> Catering</a>
+            <a sec:authorize="isAuthenticated()" href="/catering/my-requests" class="nav-btn"><i class="fas fa-list"></i> My Requests</a>
+            <a sec:authorize="isAuthenticated()" href="/cart" class="nav-btn ghost"><i class="fas fa-shopping-bag"></i> Cart</a>
+            <a sec:authorize="isAuthenticated()" href="/my-orders" class="nav-btn"><i class="fas fa-receipt"></i> Orders</a>
+            <a sec:authorize="isAuthenticated()" href="/profile" class="nav-btn"><i class="fas fa-user"></i> Profile</a>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="nav-btn primary" style="cursor:pointer"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+            <!-- Anonymous -->
+            <a sec:authorize="isAnonymous()" href="/login" class="nav-btn primary"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a sec:authorize="isAnonymous()" href="/register" class="nav-btn ghost"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+    </div>
+</nav>
+
+<!-- LOGIN / LOGOUT SUCCESS TOASTS -->
+<div th:if="${param.login}" class="toast-login" id="loginToast">
+    <i class="fas fa-check-circle"></i> You have been logged in successfully!
+</div>
+<div th:if="${param.logout}" class="toast-logout" id="logoutToast">
+    <i class="fas fa-info-circle"></i> You have been logged out successfully.
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-tag"><i class="fas fa-star"></i> Baked Fresh Daily</div>
+        <h1 class="hero-title">Freshly Baked,<br><em>Just For You</em></h1>
+        <p class="hero-sub">Discover artisanal breads, decadent cakes, and everyday savories crafted with love in our Benthota kitchen.</p>
+        <form method="get" action="/home" class="search-bar">
+            <input type="text" name="search" placeholder="Search cakes, breads, pastries…" th:value="${searchTerm}">
+            <button type="submit"><i class="fas fa-search"></i> Search</button>
+        </form>
+    </div>
+</section>
+
+<!-- PROMOTIONS (displays only if active promotions exist) -->
+<div th:if="${not #lists.isEmpty(promotions)}" class="promo-strip">
+    <div class="container">
+        <div class="row g-3">
+            <div th:each="promo : ${promotions}" class="col-md-4">
+                <div class="promo-card">
+                    <div th:if="${promo.discountPercentage != null and promo.discountPercentage > 0}" class="promo-badge" th:text="${promo.discountPercentage} + '% OFF'"></div>
+                    <div class="promo-title" th:text="${promo.title}">Promo</div>
+                    <div class="promo-desc" th:text="${promo.description}">Description</div>
+                    <div class="promo-date"><i class="fas fa-calendar-alt me-1"></i><span th:text="${#temporals.format(promo.startDate, 'dd MMM')} + ' – ' + ${#temporals.format(promo.endDate, 'dd MMM yyyy')}"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+            <h2 class="section-title">Our Menu</h2>
+            <p class="section-sub">Browse by category or explore everything we bake</p>
+        </div>
+    </div>
+    <div class="cat-pills">
+        <a href="/home" class="cat-pill" th:classappend="${selectedCategory == null ? ' active' : ''}">All Items</a>
+        <a th:each="cat : ${categories}" th:href="@{/home(category=${cat.id}, search=${searchTerm})}" class="cat-pill"
+           th:classappend="${selectedCategory != null and selectedCategory == cat.id ? ' active' : ''}"
+           th:text="${cat.name}"></a>
+    </div>
+
+    <div class="row g-4">
+        <div th:each="product : ${products}" class="col-md-4 col-lg-3">
+            <div class="product-card">
+                <div class="product-img">
+                    <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Product">
+                    <i th:unless="${product.imageUrl}" class="fas fa-bread-slice placeholder-icon"></i>
+                    <div th:if="${product.stockQuantity == null or product.stockQuantity <= 0}" class="out-of-stock-overlay"><span>Out of Stock</span></div>
+                </div>
+                <div class="product-body">
+                    <span class="cat-tag" th:text="${product.category?.name}">Category</span>
+                    <div class="product-name"><a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.name}">Product Name</a></div>
+                    <div class="star-row">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                            <i th:if="${i <= product.averageRating}" class="fas fa-star"></i>
+                            <i th:if="${i > product.averageRating and (i - 0.5) <= product.averageRating}" class="fas fa-star-half-alt"></i>
+                            <i th:if="${i > product.averageRating and (i - 0.5) > product.averageRating}" class="far fa-star"></i>
+                        </span>
+                        <span class="count" th:with="rating=${product.averageRating != null ? product.averageRating : 0}" th:text="'(' + ${#numbers.formatDecimal(rating,1,1)} + ')'"></span>
+                    </div>
+                    <p class="product-desc" th:text="${product.description}">Description</p>
+                    <div class="product-footer">
+                        <span class="price" th:text="'Rs. ' + ${#numbers.formatDecimal(product.price,1,2)}">Rs. 0.00</span>
+                        <form th:if="${product.stockQuantity != null and product.stockQuantity > 0}" th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn-cart"><i class="fas fa-plus"></i> Add</button>
+                        </form>
+                        <button th:if="${product.stockQuantity == null or product.stockQuantity <= 0}" class="btn-cart-disabled" disabled>Sold Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(products)}" class="col-12 empty-state">
+            <i class="fas fa-store-slash d-block"></i>
+            <h5 class="fw-bold" style="color:var(--ink)">No products found</h5>
+            <p>Try a different search term or category.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CHAT FAB -->
+<a href="/chatbot" class="chat-fab">
+    <i class="fas fa-comment-dots"></i>
+    <span class="badge">!</span>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-hide toast messages after 4 seconds
+    setTimeout(function() {
+        var loginToast = document.getElementById('loginToast');
+        var logoutToast = document.getElementById('logoutToast');
+        if (loginToast) {
+            loginToast.style.opacity = '0';
+            setTimeout(function(){ if(loginToast) loginToast.remove(); }, 300);
+        }
+        if (logoutToast) {
+            logoutToast.style.opacity = '0';
+            setTimeout(function(){ if(logoutToast) logoutToast.remove(); }, 300);
+        }
+    }, 4000);
+</script>
+</body>
+</html>

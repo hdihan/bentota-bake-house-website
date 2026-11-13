@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – Benthota Bake House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        /* ===== ORIGINAL LAYOUT RULES (keep exactly as before) ===== */
+        :root {
+            --brand: #C8601A; --brand-dark: #9E4A12; --brand-light: #FDF0E6;
+            --cream: #FEFAF5; --ink: #1C1410; --ink-muted: #7A6A5A; --border: #EDE0D0;
+        }
+        * { box-sizing: border-box; }
+        body { background: var(--cream); font-family: 'DM Sans', sans-serif; margin: 0; }
+
+        /* TOP NAV */
+        .top-nav {
+            background: var(--ink); padding: 0 30px; height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .brand-icon { width: 40px; height: 40px; background: var(--brand); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .brand-name { font-family: 'Playfair Display', serif; color: white; font-size: 1.1rem; font-weight: 700; }
+        .role-pill { background: rgba(200,96,26,0.25); border: 1px solid rgba(200,96,26,0.4); color: #FDB975; padding: 5px 14px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+        .nav-right { display: flex; align-items: center; gap: 14px; }
+        .user-chip { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; }
+        .user-chip .avatar { width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; }
+        .btn-logout { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #FCA5A5; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+
+        /* CONTENT */
+        .content { padding: 40px; }
+        .page-greeting { margin-bottom: 36px; }
+        .page-greeting h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--ink); margin-bottom: 6px; }
+        .page-greeting p { color: var(--ink-muted); font-size: 1rem; }
+
+        /* STAT CARDS */
+        .stat-card {
+            background: white; border-radius: 16px; padding: 24px; border: 1.5px solid var(--border);
+            display: flex; align-items: center; gap: 20px; transition: all 0.2s;
+        }
+        .stat-card:hover { border-color: var(--brand); box-shadow: 0 8px 24px rgba(200,96,26,0.1); transform: translateY(-2px); }
+        .stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+        .stat-info .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); margin-bottom: 4px; }
+        .stat-info .value { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; }
+
+        /* SECTION TITLE */
+        .divider-label { display: flex; align-items: center; gap: 12px; margin: 40px 0 20px; }
+        .divider-label span { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); white-space: nowrap; }
+        .divider-label::before, .divider-label::after { content: ''; flex: 1; height: 1.5px; background: var(--border); }
+
+        /* NAV CARDS */
+        .nav-card {
+            background: white; border-radius: 16px; border: 1.5px solid var(--border);
+            text-decoration: none; display: block; padding: 28px 20px; text-align: center;
+            transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .nav-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--brand); transform: scaleX(0); transition: transform 0.2s; }
+        .nav-card:hover { transform: translateY(-4px); border-color: var(--brand); box-shadow: 0 12px 32px rgba(200,96,26,0.12); }
+        .nav-card:hover::before { transform: scaleX(1); }
+        .nav-icon { width: 52px; height: 52px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; }
+        .nav-card-title { font-weight: 700; color: var(--ink); font-size: 0.95rem; margin-bottom: 4px; }
+        .nav-card-sub { font-size: 11px; color: var(--ink-muted); }
+        .nav-card-arrow { position: absolute; top: 14px; right: 14px; color: var(--border); font-size: 12px; transition: color 0.2s; }
+        .nav-card:hover .nav-card-arrow { color: var(--brand); }
+
+        /* ===== DARK THEME OVERRIDES (Super Admin style) ===== */
+        body {
+            background: #0F0B08 !important;
+            color: rgba(255,255,255,0.85) !important;
+        }
+        .top-nav {
+            background: #1A110A !important;
+            border-bottom: 1.5px solid rgba(200,96,26,0.2) !important;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+        }
+        .brand-name { color: white !important; }
+        .role-pill {
+            background: rgba(200,96,26,0.25) !important;
+            border-color: rgba(200,96,26,0.4) !important;
+            color: #FDB975 !important;
+        }
+        .user-chip { color: rgba(255,255,255,0.85) !important; }
+        .user-chip .avatar { background: var(--brand) !important; }
+        .btn-logout {
+            background: rgba(239,68,68,0.15) !important;
+            border-color: rgba(239,68,68,0.3) !important;
+            color: #FCA5A5 !important;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.3) !important; }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1E2A1A, #162112) !important;
+            border: 1.5px solid rgba(255,255,255,0.06) !important;
+            color: white !important;
+        }
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #1A1E2A, #121521) !important;
+        }
+        .stat-card:hover { border-color: rgba(255,255,255,0.12) !important; }
+        .stat-info .label { color: rgba(253,183,117,0.7) !important; }
+        .stat-info .value { color: white !important; }
+
+        .divider-label span { color: rgba(253,183,117,0.7) !important; }
+        .divider-label::before,
+        .divider-label::after { background: rgba(255,255,255,0.1) !important; }
+
+        .nav-card {
+            background: #1A110A !important;
+            border-color: rgba(200,96,26,0.15) !important;
+        }
+        .nav-card:hover {
+            border-color: var(--brand) !important;
+            background: #1E1411 !important;
+            box-shadow: 0 12px 32px rgba(200,96,26,0.15) !important;
+        }
+        .nav-card-title { color: white !important; }
+        .nav-card-sub { color: rgba(255,255,255,0.4) !important; }
+        .nav-card-arrow { color: rgba(255,255,255,0.2) !important; }
+        .nav-card:hover .nav-card-arrow { color: var(--brand) !important; }
+
+        .stat-icon { background: rgba(255,255,255,0.1) !important; }
+        .page-greeting h2 { color: white !important; }
+        .page-greeting p { color: rgba(255,255,255,0.6) !important; }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+        <a href="/home" class="brand">
+            <div class="brand-icon"><i class="fas fa-bread-slice"></i></div>
+            <span class="brand-name">Benthota Bake House</span>
+        </a>
+        <span class="role-pill" sec:authentication="principal.authorities">ROLE</span>
+    </div>
+    <div class="nav-right">
+        <div class="user-chip">
+            <div class="avatar"><i class="fas fa-user" style="font-size:12px"></i></div>
+            <span sec:authentication="name">Username</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-greeting">
+        <h2>Good day, <span sec:authentication="name">User</span>! 👋</h2>
+        <p>Here’s a snapshot of what’s happening at Benthota Bake House today.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(34,197,94,0.15);color:#86EFAC"><i class="fas fa-box"></i></div>
+                <div class="stat-info">
+                    <div class="label">Pending Orders</div>
+                    <div class="value" id="pendingOrders"><i class="fas fa-spinner fa-spin fa-sm" style="color:#ccc"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(200,96,26,0.15);color:#FDB975"><i class="fas fa-concierge-bell"></i></div>
+                <div class="stat-info">
+                    <div class="label">Active Catering</div>
+                    <div class="value" id="activeCatering"><i class="fas fa-spinner fa-spin fa-sm" style="color:#ccc"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access -->
+    <div class="divider-label"><span>Quick Access</span></div>
+    <div class="row g-3">
+        <!-- All roles -->
+        <div class="col-md-4 col-lg-3">
+            <a href="/home" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FDF0E6;color:#C8601A"><i class="fas fa-store"></i></div>
+                <div class="nav-card-title">Storefront</div>
+                <div class="nav-card-sub">Browse products</div>
+            </a>
+        </div>
+
+        <!-- STAFF, ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/add-product" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#E0F2FE;color:#0284C7"><i class="fas fa-plus-circle"></i></div>
+                <div class="nav-card-title">Add New Product</div>
+                <div class="nav-card-sub">Create a listing</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/staff/orders" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#EFF6FF;color:#2563EB"><i class="fas fa-shopping-bag"></i></div>
+                <div class="nav-card-title">Manage Orders</div>
+                <div class="nav-card-sub">Process orders</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/categories" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#F5F3FF;color:#7C3AED"><i class="fas fa-tags"></i></div>
+                <div class="nav-card-title">Categories</div>
+                <div class="nav-card-sub">Manage categories</div>
+            </a>
+        </div>
+
+        <!-- STAFF, ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/inventory" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#F0FDF4;color:#16A34A"><i class="fas fa-boxes"></i></div>
+                <div class="nav-card-title">Inventory &amp; Stock</div>
+                <div class="nav-card-sub">Manage supplies</div>
+            </a>
+        </div>
+
+        <!-- Product Backlog -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/products" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FFF7ED;color:#EA580C"><i class="fas fa-clipboard-list"></i></div>
+                <div class="nav-card-title">Product Backlog</div>
+                <div class="nav-card-sub">View all products</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/promotions" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FFF7ED;color:#EA580C"><i class="far fa-star"></i></div>
+                <div class="nav-card-title">Featured / Promos</div>
+                <div class="nav-card-sub">Manage campaigns</div>
+            </a>
+        </div>
+
+        <!-- STAFF, ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/staff/catering/requests" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FFF7ED;color:#EA580C"><i class="fas fa-concierge-bell"></i></div>
+                <div class="nav-card-title">Catering Requests</div>
+                <div class="nav-card-sub">Manage events</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/staff/setmenus" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FDF2F8;color:#DB2777"><i class="fas fa-utensils"></i></div>
+                <div class="nav-card-title">Set Menus</div>
+                <div class="nav-card-sub">Pre‑defined combos</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/staff/reviews" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FEF3C7;color:#D97706"><i class="fas fa-star"></i></div>
+                <div class="nav-card-title">Customer Reviews</div>
+                <div class="nav-card-sub">Moderate feedback</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/staff/delivery/dashboard" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#E0F2FE;color:#0284C7"><i class="fas fa-truck"></i></div>
+                <div class="nav-card-title">Delivery Management</div>
+                <div class="nav-card-sub">Assign & track</div>
+            </a>
+        </div>
+
+        <!-- ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('ADMIN','SUPER_ADMIN')">
+            <a href="/staff/delivery/personnel" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#F0F9FF;color:#0369A1"><i class="fas fa-users"></i></div>
+                <div class="nav-card-title">Driver Management</div>
+                <div class="nav-card-sub">Manage drivers</div>
+            </a>
+        </div>
+
+        <!-- STAFF, ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/staff/delivery-settings" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FFF1F2;color:#E11D48"><i class="fas fa-cog"></i></div>
+                <div class="nav-card-title">Delivery Settings</div>
+                <div class="nav-card-sub">Configure charges</div>
+            </a>
+        </div>
+
+        <!-- STAFF, ADMIN, SUPER_ADMIN -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasAnyRole('STAFF','ADMIN','SUPER_ADMIN')">
+            <a href="/reports/inventory" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#EFF6FF;color:#1D4ED8"><i class="fas fa-chart-line"></i></div>
+                <div class="nav-card-title">Inventory Reports</div>
+                <div class="nav-card-sub">Analytics &amp; insights</div>
+            </a>
+        </div>
+
+        <!-- SUPER_ADMIN only -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasRole('SUPER_ADMIN')">
+            <a href="/admin/users" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#F1F5F9;color:#334155"><i class="fas fa-users-cog"></i></div>
+                <div class="nav-card-title">User Management</div>
+                <div class="nav-card-sub">Roles &amp; access</div>
+            </a>
+        </div>
+
+        <!-- SUPER_ADMIN only -->
+        <div class="col-md-4 col-lg-3" sec:authorize="hasRole('SUPER_ADMIN')">
+            <a href="/super-admin/dashboard" class="nav-card">
+                <i class="fas fa-chevron-right nav-card-arrow"></i>
+                <div class="nav-icon" style="background:#FFFBEB;color:#D97706"><i class="fas fa-crown"></i></div>
+                <div class="nav-card-title">Super Admin Panel</div>
+                <div class="nav-card-sub">Full system control</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    fetch('/api/orders/pending-count').then(r => r.json()).then(d => { document.getElementById('pendingOrders').textContent = d.count || 0; }).catch(() => { document.getElementById('pendingOrders').textContent = '0'; });
+    fetch('/api/catering/active-count').then(r => r.json()).then(d => { document.getElementById('activeCatering').textContent = d.count || 0; }).catch(() => { document.getElementById('activeCatering').textContent = '0'; });
+</script>
+</body>
+</html>

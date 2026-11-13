@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Product – Benthota Bake House</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        .container-custom { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .section-card { background: white; border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-sm); }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<nav class="top-nav">
+    <div class="container">
+        <div class="left-area d-flex align-items-center gap-3">
+            <a href="/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <span class="page-title font-playfair">Add New Product</span>
+        </div>
+        <div class="right-area d-flex align-items-center gap-3">
+            <span class="fw-bold"><i class="fas fa-user-circle me-1"></i><span sec:authentication="name"></span></span>
+            <form th:action="@{/logout}" method="post" class="m-0">
+                <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-custom">
+    <div class="section-card">
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <form th:action="@{/add-product}" th:object="${product}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Product Name</label>
+                <input type="text" th:field="*{name}" class="form-control" placeholder="e.g., Chocolate Cake" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea th:field="*{description}" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Price (Rs.)</label>
+                    <input type="number" step="0.01" th:field="*{price}" class="form-control" placeholder="0.00" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Initial Stock</label>
+                    <input type="number" th:field="*{stockQuantity}" class="form-control" value="0" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Category</label>
+                    <select th:field="*{category.id}" class="form-select" required>
+                        <option value="">-- Select Category --</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Status</label>
+                    <select th:field="*{status}" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Product Image</label>
+                <input type="file" name="imageFile" class="form-control" accept="image/*">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Expiration Date (optional)</label>
+                <input type="date" th:field="*{expirationDate}" class="form-control">
+            </div>
+            <div class="d-flex justify-content-between pt-3 border-top">
+                <a href="/dashboard" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

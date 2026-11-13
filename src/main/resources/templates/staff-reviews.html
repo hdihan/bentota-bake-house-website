@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Reviews – Benthota Bake House</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        :root {
+            --brand: #C8601A; --brand-dark: #9E4A12;
+        }
+        body {
+            background: #0F0B08;
+            font-family: 'DM Sans', sans-serif;
+            color: rgba(255,255,255,0.85);
+            margin: 0;
+        }
+
+        /* TOP NAV */
+        .top-nav {
+            background: #1A110A;
+            padding: 0 30px; height: 66px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1.5px solid rgba(200,96,26,0.2);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .left-area { display: flex; align-items: center; gap: 20px; }
+        .btn-back {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 16px; border-radius: 8px; color: rgba(255,255,255,0.85);
+            text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.15); border-color: var(--brand); color: white; }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: white; font-weight: 700; }
+        .right-area { display: flex; align-items: center; gap: 14px; }
+        .user-chip { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; }
+        .user-chip .avatar { width: 32px; height: 32px; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: white; }
+        .btn-logout {
+            background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);
+            color: #FCA5A5; padding: 8px 18px; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.3); }
+
+        .content { padding: 30px 40px; }
+
+        /* DATA CARD */
+        .data-card {
+            background: #1A110A;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1.5px solid rgba(200,96,26,0.15);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+
+        /* TABLE – orange theme */
+        .table {
+            color: #ffffff !important;
+            border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden;
+        }
+        .table thead th {
+            background-color: var(--brand) !important;
+            color: white !important; border: none !important;
+            padding: 14px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .table tbody td {
+            background-color: rgba(200,96,26,0.08) !important;
+            color: #ffffff !important; border-bottom: 1px solid rgba(200,96,26,0.2) !important;
+            padding: 12px 16px;
+        }
+        .table tbody tr:last-child td { border-bottom: none !important; }
+        .table-hover tbody tr:hover { background-color: transparent !important; }
+        .table tbody tr:hover td {
+            background-color: rgba(245,158,11,0.8) !important;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Star colors */
+        .text-warning { color: #F59E0B !important; }
+        .far.fa-star { color: rgba(255,255,255,0.2); }
+
+        /* Badges */
+        .badge-success {
+            background: rgba(34,197,94,0.25) !important;
+            color: #86EFAC !important;
+            border: 1px solid rgba(34,197,94,0.4);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--brand); border: none; color: white; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-primary:hover { background: var(--brand-dark); }
+        .btn-delete {
+            background: transparent;
+            border: 1px solid rgba(239,68,68,0.4);
+            color: #FCA5A5;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-delete:hover {
+            background: rgba(239,68,68,0.15);
+            border-color: #FCA5A5;
+            color: #FEE2E2;
+        }
+
+        .fw-bold { color: white !important; }
+        .text-muted { color: rgba(255,255,255,0.5) !important; }
+    </style>
+</head>
+<body th:class="${role + '-theme'}">
+
+<nav class="top-nav">
+    <div class="left-area">
+        <a href="/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <span class="page-title">Customer Reviews</span>
+    </div>
+    <div class="right-area">
+        <div class="user-chip">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <span sec:authentication="name">Username</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold" style="color:white; font-family: 'Playfair Display', serif;">
+            <i class="fas fa-star me-2" style="color:var(--brand)"></i>Customer Reviews
+        </h3>
+        <a href="/reports/inventory" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:8px;">
+            <i class="fas fa-chart-line"></i> Reports
+        </a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" style="background:#14532d;border-left:4px solid #10b981;color:#86efac;padding:12px 20px;border-radius:8px;margin-bottom:20px;">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger" style="background:#7f1d1d;border-left:4px solid #ef4444;color:#fca5a5;padding:12px 20px;border-radius:8px;margin-bottom:20px;">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+    </div>
+
+    <div class="data-card">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Customer</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="review : ${reviews}">
+                    <td class="fw-bold" th:text="${review.product.name}">Product</td>
+                    <td th:text="${review.user.username}">Customer</td>
+                    <td>
+                            <span th:each="i : ${#numbers.sequence(1,5)}">
+                                <i th:if="${i <= review.rating}" class="fas fa-star text-warning"></i>
+                                <i th:if="${i > review.rating}" class="far fa-star"></i>
+                            </span>
+                    </td>
+                    <td th:text="${review.comment}">Comment</td>
+                    <td th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}">Date</td>
+                    <td><span class="badge badge-success" th:text="${review.status}">Status</span></td>
+                    <td class="text-end">
+                        <a th:href="@{/staff/reviews/{id}/delete(id=${review.id})}"
+                           class="btn-delete"
+                           onclick="return confirm('Delete this review?');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(reviews)}">
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="fas fa-star fa-2x mb-3" style="opacity:0.3"></i><br>
+                        No reviews yet.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
